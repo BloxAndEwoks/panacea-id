@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/protocol" },
+    { "path": "packages/ballot" },
+    { "path": "packages/credentials" },
+    { "path": "packages/better-auth" },
+    { "path": "apps/civic" }
+  ]
+}

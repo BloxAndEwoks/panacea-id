@@ -1,0 +1,23 @@
+{
+  "name": "@panacea-id/better-auth",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "@panacea-id/protocol": "workspace:*",
+    "zod": "^4.1.11"
+  },
+  "peerDependencies": {
+    "better-auth": "^1.7.0"
+  },
+  "devDependencies": {
+    "better-auth": "^1.7.5"
+  }
+}

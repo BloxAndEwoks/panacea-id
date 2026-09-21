@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "composite": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["server", "src", "vite.config.ts"],
+  "references": [
+    { "path": "../../packages/protocol" },
+    { "path": "../../packages/ballot" },
+    { "path": "../../packages/credentials" },
+    { "path": "../../packages/better-auth" }
+  ]
+}
