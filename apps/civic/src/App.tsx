@@ -243,7 +243,15 @@ export function App() {
                   <li key={entry.hash}>{entry.hash.slice(0, 8)}</li>
                 ))}
               </ol>
-              {state.tally ? <Tally tally={state.tally} projects={state.projects} onAudit={onAudit} audit={audit} /> : null}
+              {state.tally ? (
+                <Tally
+                  tally={state.tally}
+                  purse={state.election.purse}
+                  projects={state.projects}
+                  onAudit={onAudit}
+                  audit={audit}
+                />
+              ) : null}
             </div>
           ) : null}
 
@@ -301,11 +309,13 @@ export function App() {
 
 function Tally({
   tally,
+  purse,
   projects,
   onAudit,
   audit,
 }: {
   tally: PublishedTally;
+  purse: number;
   projects: readonly string[];
   onAudit: () => void;
   audit: string | null;
@@ -313,7 +323,7 @@ function Tally({
   return (
     <div className="tally">
       <p className="seal-mark">Opened</p>
-      <p className="purse">100,000 harbor marks, split by the sealed preferences</p>
+      <p className="purse">{purse.toLocaleString("en-US")} harbor marks, split by the sealed preferences</p>
       <ol>
         {projects.map((project, index) => (
           <li key={project}>
