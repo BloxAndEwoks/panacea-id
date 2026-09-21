@@ -74,8 +74,9 @@ describe("harbor commons", () => {
       expect(released.status).toBe(200);
     }
     const opened = (await (await civic.app.request("/api/state")).json()) as {
-      tally: { counts: number[] };
+      tally: { counts: number[]; allocation: number[] };
     };
     expect(opened.tally.counts).toEqual([1, 0, 0, 0]);
+    expect(opened.tally.allocation).toEqual([100_000, 0, 0, 0]);
   });
 });

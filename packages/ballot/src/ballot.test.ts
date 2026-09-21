@@ -20,6 +20,7 @@ describe("sealed plurality ballots", () => {
     const election = createElection({
       id: "harbor-commons",
       options: ["Mangrove nursery", "Night clinic", "Public well"],
+      purse: 100,
       threshold: 2,
       trustees: 3,
       rsaPublicKey: keys.publicKey,
@@ -69,6 +70,8 @@ describe("sealed plurality ballots", () => {
     );
     const tally = openTally({ election: election.public, board, partials });
     expect(tally.counts).toEqual([2, 0, 1]);
+    expect(tally.allocation).toEqual([67, 0, 33]);
+    expect(tally.allocation.reduce((sum, share) => sum + share, 0)).toBe(100);
     expect(
       verifyPublishedTally({
         election: election.public,
@@ -86,6 +89,16 @@ describe("sealed plurality ballots", () => {
         election: election.public,
         entries: tampered,
         tally,
+      }),
+    ).toBe(false);
+
+    const badAllocation = structuredClone(tally);
+    badAllocation.allocation = [100, 0, 0];
+    expect(
+      verifyPublishedTally({
+        election: election.public,
+        entries: board.entries(),
+        tally: badAllocation,
       }),
     ).toBe(false);
 

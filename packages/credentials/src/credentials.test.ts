@@ -28,6 +28,7 @@ describe("eligibility desk", () => {
     const election = createElection({
       id: "harbor-commons",
       options: ["Mangrove nursery", "Night clinic"],
+      purse: 50,
       threshold: 1,
       trustees: 1,
       rsaPublicKey: keys.publicKey,

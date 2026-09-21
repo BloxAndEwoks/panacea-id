@@ -34,6 +34,8 @@ import { verifyCredential, type RsaPublicKey } from "./rsa.js";
 export type ElectionPublic = {
   id: string;
   options: readonly string[];
+  /** Integer purse divided across options by the opened vote counts. */
+  purse: number;
   publicKey: string;
   threshold: number;
   commitments: readonly { index: number; commitment: string }[];
@@ -50,6 +52,7 @@ export type ElectionSecrets = {
 export function createElection(input: {
   id: string;
   options: readonly string[];
+  purse: number;
   threshold: number;
   trustees: number;
   rsaPublicKey: RsaPublicKey;
@@ -65,6 +68,7 @@ export function createElection(input: {
     public: {
       id: input.id,
       options: [...input.options],
+      purse: assertPurse(input.purse),
       publicKey: pointHex(publicKey),
       threshold: input.threshold,
       commitments: trustees.map(({ index, commitment }) => ({ index, commitment })),
@@ -246,8 +250,36 @@ export type PublishedTally = {
   electionId: string;
   boardHash: string;
   counts: number[];
+  /** Largest-remainder shares of `election.purse`. Sums to the purse when anyone voted. */
+  allocation: number[];
   partials: PartialDecrypt[];
 };
+
+/** Split an integer purse by vote counts. The remainders go to the largest fractional shares. */
+export function allocatePurse(counts: readonly number[], purse: number): number[] {
+  const budget = assertPurse(purse);
+  if (counts.some((count) => !Number.isInteger(count) || count < 0)) {
+    throw new Error("Vote counts must be non-negative integers");
+  }
+  const total = counts.reduce((sum, count) => sum + count, 0);
+  if (total === 0) return counts.map(() => 0);
+  const shares = counts.map((count) => Math.floor((budget * count) / total));
+  let remainder = budget - shares.reduce((sum, share) => sum + share, 0);
+  const ranked = counts
+    .map((count, index) => ({ index, remainder: (budget * count) % total }))
+    .sort((left, right) => right.remainder - left.remainder || left.index - right.index);
+  for (const item of ranked) {
+    if (remainder === 0) break;
+    shares[item.index] = (shares[item.index] ?? 0) + 1;
+    remainder -= 1;
+  }
+  return shares;
+}
+
+function assertPurse(purse: number): number {
+  if (!Number.isInteger(purse) || purse < 0) throw new Error("Purse must be a non-negative integer");
+  return purse;
+}
 
 export function openTally(input: {
   election: ElectionPublic;
@@ -282,7 +314,8 @@ export function verifyPublishedTally(input: {
     });
     return (
       recomputed.boardHash === chainHash(input.entries) &&
-      canonicalJson(recomputed.counts) === canonicalJson(input.tally.counts)
+      canonicalJson(recomputed.counts) === canonicalJson(input.tally.counts) &&
+      canonicalJson(recomputed.allocation) === canonicalJson(input.tally.allocation)
     );
   } catch {
     return false;
@@ -359,12 +392,13 @@ function combine(input: {
     if (count === null) throw new Error("Tally is outside the published bound");
     counts.push(count);
   }
-  return {
-    electionId: input.election.id,
-    boardHash: input.boardHash,
-    counts,
-    partials: used,
-  };
+    return {
+      electionId: input.election.id,
+      boardHash: input.boardHash,
+      counts,
+      allocation: allocatePurse(counts, input.election.purse),
+      partials: used,
+    };
 }
 
 export function sumBoardColumns(entries: readonly BoardEntry[], options: number): CiphertextJson[] {
