@@ -138,7 +138,11 @@ export function App() {
       entries: state.board,
       tally: state.tally,
     });
-    setAudit(ok ? "The published count matches the board." : "The published count does not match the board.");
+    setAudit(
+      ok
+        ? "The published allocation matches the board."
+        : "The published allocation does not match the board.",
+    );
   }
 
   if (!state) {
@@ -239,7 +243,15 @@ export function App() {
                   <li key={entry.hash}>{entry.hash.slice(0, 8)}</li>
                 ))}
               </ol>
-              {state.tally ? <Tally tally={state.tally} projects={state.projects} onAudit={onAudit} audit={audit} /> : null}
+              {state.tally ? (
+                <Tally
+                  tally={state.tally}
+                  purse={state.election.purse}
+                  projects={state.projects}
+                  onAudit={onAudit}
+                  audit={audit}
+                />
+              ) : null}
             </div>
           ) : null}
 
@@ -297,11 +309,13 @@ export function App() {
 
 function Tally({
   tally,
+  purse,
   projects,
   onAudit,
   audit,
 }: {
   tally: PublishedTally;
+  purse: number;
   projects: readonly string[];
   onAudit: () => void;
   audit: string | null;
@@ -309,16 +323,20 @@ function Tally({
   return (
     <div className="tally">
       <p className="seal-mark">Opened</p>
+      <p className="purse">{purse.toLocaleString("en-US")} harbor marks, split by the sealed preferences</p>
       <ol>
         {projects.map((project, index) => (
           <li key={project}>
             <span>{project}</span>
-            <strong>{tally.counts[index] ?? 0}</strong>
+            <span className="figures">
+              <strong>{(tally.allocation[index] ?? 0).toLocaleString("en-US")}</strong>
+              <small>{tally.counts[index] ?? 0} sealed</small>
+            </span>
           </li>
         ))}
       </ol>
       <button type="button" onClick={onAudit}>
-        Check the count
+        Check the allocation
       </button>
       {audit ? <p className="audit">{audit}</p> : null}
     </div>

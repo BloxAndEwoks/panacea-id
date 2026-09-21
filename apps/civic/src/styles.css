@@ -192,7 +192,26 @@ pre {
 
 .tally ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
 
-.tally li, .trustees li {
+.figures {
+  display: grid;
+  justify-items: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.figures small {
+  color: #4d6358;
+  font-weight: 400;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+
+.purse {
+  margin: 0;
+  max-width: 22rem;
+}
+
+.tally li,
+.trustees li {
   display: flex;
   justify-content: space-between;
   gap: 0.8rem;

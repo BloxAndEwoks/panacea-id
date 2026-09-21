@@ -69,6 +69,7 @@ export function createCivic() {
   const election = createElection({
     id: ELECTION_ID,
     options: PROJECTS,
+    purse: 100_000,
     threshold: 2,
     trustees: 3,
     rsaPublicKey: keys.publicKey,

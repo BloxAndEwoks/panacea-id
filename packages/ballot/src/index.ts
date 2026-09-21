@@ -1,4 +1,5 @@
 export {
+  allocatePurse,
   ballotIsValid,
   BulletinBoard,
   createElection,

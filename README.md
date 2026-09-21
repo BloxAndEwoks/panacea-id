@@ -38,6 +38,8 @@ await authClient.zkPassport.verify({
 
 A real deployment passes phone proofs to `@zkpassport/sdk` by setting `zkPassportDomain`. The Harbor commons pilot uses a development verifier and labels every record `assurance: "development"`. It does not read a passport chip, and it does not assume El Salvador's DUI exposes an ICAO trust chain.
 
+Each participant seals one preference. When two trustees open the count, a purse of 100,000 harbor marks is split across the projects by those preferences. Largest remainders make the shares add up to the purse. The independent check recomputes both the vote counts and that split.
+
 ## Run
 
 ```bash
